@@ -1,3 +1,4 @@
+// a point in 2D bounded in the x-axis by [0, +inf], and y-axis by [0, 1]
 public struct Point: CustomStringConvertible {
     
     public var description: String {
@@ -14,6 +15,7 @@ public struct Point: CustomStringConvertible {
     }
 }
 
+// a slope bounded in the x-axis by [minX, maxX]
 public struct PointsAndSlope: CustomStringConvertible {
     
     public var description: String {
@@ -37,6 +39,7 @@ public struct PointsAndSlope: CustomStringConvertible {
     }
 }
 
+// a set of points/slopes bounded in the x-axis by [minX, maxX] that create a polygonal shape
 public struct FuzzySet: CustomStringConvertible, CustomDebugStringConvertible {
     
     public var description: String {
@@ -84,6 +87,7 @@ public struct FuzzySet: CustomStringConvertible, CustomDebugStringConvertible {
     }
 }
 
+// a collection of fuzzy sets for a fuzzy variable
 public struct FuzzyVariable {
     
     public var name = "Unnamed Membership Polygon"
@@ -102,7 +106,7 @@ public struct DegreesOfMembership: CustomStringConvertible {
     
     public var description: String {
         var finalStr = "degrees of membership for \(fuzzyVariable.name) with value \(value)\n"
-        for dom in degreesOfMemberShip {
+        for dom in degreesOfMemberShipForSets {
             finalStr += "\(dom.0.description) \(dom.1)%\n"
         }
         return finalStr
@@ -110,14 +114,14 @@ public struct DegreesOfMembership: CustomStringConvertible {
     
     public var fuzzyVariable: FuzzyVariable
     public var value: Double
-    public var degreesOfMemberShip: [(FuzzySet, Double)]
+    public var degreesOfMemberShipForSets: [(FuzzySet, Double)]
     
     public init(fuzzyVariable: FuzzyVariable, value: Double) {        
         self.fuzzyVariable = fuzzyVariable
         self.value = value
-        degreesOfMemberShip = [(FuzzySet, Double)]()
+        degreesOfMemberShipForSets = [(FuzzySet, Double)]()
         for set in fuzzyVariable.fuzzySets {
-            degreesOfMemberShip.append(calculateFuzziness(fuzzySet: set, value: value))
+            degreesOfMemberShipForSets.append(calculateFuzziness(fuzzySet: set, value: value))
         }
     }
     
@@ -168,4 +172,16 @@ public struct DegreesOfMembership: CustomStringConvertible {
         
         return (fuzzySet, minDegreeOfMembership)
     }
+}
+
+public struct CombsSystemOutput {
+    
+    public let degreesOfMembership: [DegreesOfMembership]
+    
+    init(degreesOfMembership: [DegreesOfMembership]) {
+        self.degreesOfMembership = degreesOfMembership
+    }
+    
+    
+    
 }
