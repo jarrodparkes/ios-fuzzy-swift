@@ -24,7 +24,42 @@ let satisfied = FuzzySet(name: "satisfied", points: Point(x: 2, y: 0)!, Point(x:
 let overjoyed = FuzzySet(name: "overjoyed", points: Point(x: 7, y: 0)!, Point(x: 10, y: 1)!, Point(x: 10, y: 0)!)
 let happiness = FuzzyVariable(name: "happiness", fuzzySets: sad, satisfied, overjoyed)
 
-print(DegreesOfMembership(fuzzyVariable: fatigue, value: 3.2))
-print(DegreesOfMembership(fuzzyVariable: hunger, value: 3.2))
-print(DegreesOfMembership(fuzzyVariable: cleanliness, value: 3.2))
-print(DegreesOfMembership(fuzzyVariable: happiness, value: 3.2))
+let membershipsForFatigue = DegreesOfMembership(fuzzyVariable: fatigue, value: 3.2)
+let membershipsForHunger = DegreesOfMembership(fuzzyVariable: hunger, value: 3.2)
+let membershipsForCleanliness = DegreesOfMembership(fuzzyVariable: cleanliness, value: 3.2)
+let membershipsForHappiness = DegreesOfMembership(fuzzyVariable: happiness, value: 3.2)
+
+// define outputs
+enum CatStateOutputs: CombsOutput {
+    case Play
+    case Sleep
+    case Poop
+    case Meow
+    case Eat
+    case Groom
+    case Purr
+}
+
+// define output rules
+let outputRules: [FuzzySet: CombsOutput] = [
+    wideAwake: CatStateOutputs.Play,
+    weary: CatStateOutputs.Sleep,
+    veryTired: CatStateOutputs.Sleep,
+    full: CatStateOutputs.Poop,
+    craving: CatStateOutputs.Meow,
+    famished: CatStateOutputs.Eat,
+    gross: CatStateOutputs.Groom,
+    dirty: CatStateOutputs.Groom,
+    clean: CatStateOutputs.Purr,
+    sad: CatStateOutputs.Meow,
+    satisfied: CatStateOutputs.Sleep,
+    overjoyed: CatStateOutputs.Purr
+]
+
+let membershipsForVariables = [
+    membershipsForFatigue, membershipsForHunger, membershipsForCleanliness, membershipsForHappiness
+]
+
+let finalOutput = CombsSystemOutput(membershipsForVariables: membershipsForVariables, outputRules: outputRules)
+
+finalOutput.determineAnswer()

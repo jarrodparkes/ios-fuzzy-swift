@@ -40,18 +40,20 @@ public struct PointsAndSlope: CustomStringConvertible {
 }
 
 // a set of points/slopes bounded in the x-axis by [minX, maxX] that create a polygonal shape
-public struct FuzzySet: CustomStringConvertible, CustomDebugStringConvertible {
+public struct FuzzySet: CustomStringConvertible, CustomDebugStringConvertible, Hashable, Equatable {
     
     public var description: String {
         return "\(name):"
     }
     
     public var debugDescription: String {
-        var finalStr = "\(name): "
+        let finalStr = "\(name): "
+        /*
         for point in points {
             finalStr += "\(point)"
         }
         finalStr += " -- minX: \(minX), maxX: \(maxX) -- "
+        */
         return finalStr
     }
     
@@ -85,6 +87,14 @@ public struct FuzzySet: CustomStringConvertible, CustomDebugStringConvertible {
             maxX = biggestX
         }
     }
+    
+    public var hashValue: Int {
+        return "\(description)".hashValue
+    }
+}
+
+public func ==(lhs: FuzzySet, rhs: FuzzySet) -> Bool {
+    return lhs.hashValue == rhs.hashValue
 }
 
 // a collection of fuzzy sets for a fuzzy variable
@@ -124,64 +134,93 @@ public struct DegreesOfMembership: CustomStringConvertible {
             degreesOfMemberShipForSets.append(calculateFuzziness(fuzzySet: set, value: value))
         }
     }
+}
+
+public protocol CombsOutput {}
+
+public struct CombsSystemOutput {
     
-    public func calculateFuzziness(fuzzySet fuzzySet: FuzzySet, value: Double) -> (FuzzySet, Double) {
+    public let membershipsForVariables: [DegreesOfMembership]
+    public let outputRules: [FuzzySet: CombsOutput]
+    
+    public init(membershipsForVariables: [DegreesOfMembership], outputRules: [FuzzySet: CombsOutput]) {
+        self.membershipsForVariables = membershipsForVariables
+        self.outputRules = outputRules
+    }
+    
+    public func determineAnswer() {
         
-        if fuzzySet.points.count < 2 {
-            return (fuzzySet, 0)
-        }
+        var outputs = [FuzzySet: Double]()
         
-        func slope(p1 p1: Point, p2: Point) -> Double? {
-            if p2.x - p1.x <= 0 {
-                return nil
-            } else if p2.y - p1.y == 0 {
-                return 0
-            } else {
-                return (p2.y - p1.y) / (p2.x - p1.x)
+        for membershipsForVariable in membershipsForVariables {
+            for degreesOfMembershipInSet in membershipsForVariable.degreesOfMemberShipForSets {
+                outputs[degreesOfMembershipInSet.0] = degreesOfMembershipInSet.1
             }
         }
         
-        func pointSlope(p1 p1: Point, pointsAndSlope: PointsAndSlope) -> (Double -> Double) {
-            if pointsAndSlope.m == 0 {
-                return { (x) in p1.y }
-            } else {
-                return { (x) in return (pointsAndSlope.m * x) - (pointsAndSlope.m * p1.x) + p1.y }
+        print(outputs)
+        
+        var bestScore = 0.0
+        var bestOutput: CombsOutput? = nil
+        
+        for output in outputs {
+            if output.1 > bestScore {
+                bestScore = output.1
+                bestOutput = outputRules[output.0]!
             }
+            print("\(outputRules[output.0]!): \(output.1)")
         }
         
-        var minDegreeOfMembership = 0.0
+        if let bestOutput = bestOutput {
+            print("the cat should ==> \(bestOutput)")
+        }        
+    }
+}
+
+public func calculateFuzziness(fuzzySet fuzzySet: FuzzySet, value: Double) -> (FuzzySet, Double) {
     
-        if value <= fuzzySet.maxX && value >= fuzzySet.minX {
-            for index in 0...fuzzySet.points.count - 2 {
-                let p1 = fuzzySet.points[index]
-                let p2 = fuzzySet.points[index+1]
-                if let pointsAndSlope = PointsAndSlope(p1: p1, p2: p2) {
-                    if value <= pointsAndSlope.maxX && value >= pointsAndSlope.minX {
-                        let lineFunction = pointSlope(p1: p2, pointsAndSlope: pointsAndSlope)
-                        let finalY = lineFunction(value)
-                        if finalY >= 0 && finalY <= 1 {
-                            let percentY = finalY * 100
-                            if percentY > minDegreeOfMembership {
-                                minDegreeOfMembership = percentY
-                            }
+    if fuzzySet.points.count < 2 {
+        return (fuzzySet, 0)
+    }
+    
+    func slope(p1 p1: Point, p2: Point) -> Double? {
+        if p2.x - p1.x <= 0 {
+            return nil
+        } else if p2.y - p1.y == 0 {
+            return 0
+        } else {
+            return (p2.y - p1.y) / (p2.x - p1.x)
+        }
+    }
+    
+    func pointSlope(p1 p1: Point, pointsAndSlope: PointsAndSlope) -> (Double -> Double) {
+        if pointsAndSlope.m == 0 {
+            return { (x) in p1.y }
+        } else {
+            return { (x) in return (pointsAndSlope.m * x) - (pointsAndSlope.m * p1.x) + p1.y }
+        }
+    }
+    
+    var minDegreeOfMembership = 0.0
+    
+    if value <= fuzzySet.maxX && value >= fuzzySet.minX {
+        for index in 0...fuzzySet.points.count - 2 {
+            let p1 = fuzzySet.points[index]
+            let p2 = fuzzySet.points[index+1]
+            if let pointsAndSlope = PointsAndSlope(p1: p1, p2: p2) {
+                if value <= pointsAndSlope.maxX && value >= pointsAndSlope.minX {
+                    let lineFunction = pointSlope(p1: p2, pointsAndSlope: pointsAndSlope)
+                    let finalY = lineFunction(value)
+                    if finalY >= 0 && finalY <= 1 {
+                        let percentY = finalY * 100
+                        if percentY > minDegreeOfMembership {
+                            minDegreeOfMembership = percentY
                         }
                     }
                 }
             }
         }
-        
-        return (fuzzySet, minDegreeOfMembership)
-    }
-}
-
-public struct CombsSystemOutput {
-    
-    public let degreesOfMembership: [DegreesOfMembership]
-    
-    init(degreesOfMembership: [DegreesOfMembership]) {
-        self.degreesOfMembership = degreesOfMembership
     }
     
-    
-    
+    return (fuzzySet, minDegreeOfMembership)
 }
