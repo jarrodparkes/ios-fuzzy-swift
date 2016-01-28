@@ -37,7 +37,7 @@ public struct PointsAndSlope: CustomStringConvertible {
     }
 }
 
-public struct MembershipPolygon: CustomStringConvertible, CustomDebugStringConvertible {
+public struct FuzzySet: CustomStringConvertible, CustomDebugStringConvertible {
     
     public var description: String {
         return "\(name):"
@@ -87,11 +87,11 @@ public struct MembershipPolygon: CustomStringConvertible, CustomDebugStringConve
 public struct FuzzyVariable {
     
     public var name = "Unnamed Membership Polygon"
-    public var fuzzySets: [MembershipPolygon]
+    public var fuzzySets: [FuzzySet]
     
-    public init(name: String, fuzzySets: MembershipPolygon...) {
+    public init(name: String, fuzzySets: FuzzySet...) {
         self.name = name
-        self.fuzzySets = [MembershipPolygon]()
+        self.fuzzySets = [FuzzySet]()
         for set in fuzzySets {
             self.fuzzySets.append(set)
         }
@@ -110,18 +110,18 @@ public struct DegreesOfMembership: CustomStringConvertible {
     
     public var fuzzyVariable: FuzzyVariable
     public var value: Double
-    public var degreesOfMemberShip: [(MembershipPolygon, Double)]
+    public var degreesOfMemberShip: [(FuzzySet, Double)]
     
     public init(fuzzyVariable: FuzzyVariable, value: Double) {        
         self.fuzzyVariable = fuzzyVariable
         self.value = value
-        degreesOfMemberShip = [(MembershipPolygon, Double)]()
+        degreesOfMemberShip = [(FuzzySet, Double)]()
         for set in fuzzyVariable.fuzzySets {
             degreesOfMemberShip.append(calculateFuzziness(fuzzySet: set, value: value))
         }
     }
     
-    public func calculateFuzziness(fuzzySet fuzzySet: MembershipPolygon, value: Double) -> (MembershipPolygon, Double) {
+    public func calculateFuzziness(fuzzySet fuzzySet: FuzzySet, value: Double) -> (FuzzySet, Double) {
         
         if fuzzySet.points.count < 2 {
             return (fuzzySet, 0)
