@@ -3,5 +3,6 @@
     <pages>
         <page name='AggressionExample'/>
         <page name='TipExample'/>
+        <page name='CatsExample'/>
     </pages>
 </playground>
