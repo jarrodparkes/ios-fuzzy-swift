@@ -3,7 +3,7 @@
 // fatigue
 let wideAwake = FuzzySet(name: "wideAwake", points: Point(x: 0, y: 0)!, Point(x: 0, y: 1)!, Point(x: 1, y: 1)!, Point(x: 4, y: 0)!)
 let weary = FuzzySet(name: "weary", points: Point(x: 3, y: 0)!, Point(x: 5, y: 1)!, Point(x: 7, y: 0)!)
-let veryTired = FuzzySet(name: "veryTired", points: Point(x: 6, y: 0)!, Point(x: 9, y: 1)!, Point(x: 10, y: 1)!, Point(x: 10, y: 0)!)
+let veryTired = FuzzySet(name: "exhausted", points: Point(x: 6, y: 0)!, Point(x: 9, y: 1)!, Point(x: 10, y: 1)!, Point(x: 10, y: 0)!)
 var fatigue = FuzzyVariable(name: "fatigue", fuzzySets: wideAwake, weary, veryTired)
 
 // hunger
@@ -15,7 +15,7 @@ var hunger = FuzzyVariable(name: "hunger", fuzzySets: full, craving, famished)
 // cleanliness
 let gross = FuzzySet(name: "gross", points: Point(x: 0, y: 0)!, Point(x: 0, y: 1)!, Point(x: 2, y: 0)!)
 let dirty = FuzzySet(name: "dirty", points: Point(x: 1, y: 0)!, Point(x: 6, y: 1)!, Point(x: 7, y: 0)!)
-let clean = FuzzySet(name: "clean", points: Point(x: 4, y: 0)!, Point(x: 7, y: 1)!, Point(x: 10, y: 1)!, Point(x: 10, y: 0)!)
+let clean = FuzzySet(name: "pristine", points: Point(x: 4, y: 0)!, Point(x: 7, y: 1)!, Point(x: 10, y: 1)!, Point(x: 10, y: 0)!)
 var cleanliness = FuzzyVariable(name: "cleanliness", fuzzySets: gross, dirty, clean)
 
 // happiness
